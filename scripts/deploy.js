@@ -11,7 +11,7 @@ async function main() {
   console.log("TickerDao address", tickerDao.address);
 
   const Ticker = await ethers.getContractFactory("Ticker");
-  const ticker = await Ticker.deploy("0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e");
+  const ticker = await Ticker.deploy();
 
   console.log("Ticker utility contract address:", ticker.address);
 }
