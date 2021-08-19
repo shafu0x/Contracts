@@ -47,7 +47,7 @@ async function main() {
 
         let node = namehash.hash('tkn.eth') 
 
-        let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0, gasPrice: gasPrice )
+        let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0, { gasPrice: gasPrice })
         console.log("Waiting for", normalizedTicker, "subnodeRecord transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainTx.hash)
         await ethers.provider.waitForTransaction(newSubdomainTx.hash, 1);
 
