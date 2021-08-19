@@ -6,6 +6,8 @@ const tokenData = require('../data/seed_erc20s.json')
 
 const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
 
+let gasPrice = 20000000000
+
 async function main() {
   const [deployer] = await ethers.getSigners();
 
@@ -45,12 +47,12 @@ async function main() {
 
         let node = namehash.hash('tkn.eth') 
 
-        let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0)
+        let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0, gasPrice: gasPrice )
         console.log("Waiting for", normalizedTicker, "subnodeRecord transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainTx.hash)
         await ethers.provider.waitForTransaction(newSubdomainTx.hash, 1);
 
         let fullNode = namehash.hash(`${normalizedTicker}.tkn.eth`)
-        let newSubdomainAddrTx = await resolverContract.setAddr(fullNode, token.mainnet_contract_address, { gasLimit: 200000, gasPrice: 20000000000 })
+        let newSubdomainAddrTx = await resolverContract.setAddr(fullNode, token.mainnet_contract_address, { gasLimit: 200000, gasPrice: gasPrice })
 
         console.log("Waiting for", normalizedTicker, "setAddr transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainAddrTx.hash)
         await ethers.provider.waitForTransaction(newSubdomainAddrTx.hash, 1);
