@@ -2,7 +2,7 @@ const namehash = require('eth-ens-namehash')
 
 const ensAbi = require('../resources/ens_abi.json')
 const publicResolverAbi = require('../resources/public_resolver_abi.json')
-const tokenData = require('../data/tokens.json')
+const tokenData = require('../data/seed_erc20s.json')
 
 const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
 
