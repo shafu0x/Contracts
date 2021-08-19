@@ -42,10 +42,8 @@ async function main() {
         console.log(normalizedTicker, "not set. Registering and configuring addr.", )
 
         let subdomainLabel = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(normalizedTicker))
-        console.log("subdomainLabel", subdomainLabel)
 
         let node = namehash.hash('tkn.eth') 
-        console.log("node", node)
 
         let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0)
         console.log("Waiting for", normalizedTicker, "subnodeRecord transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainTx.hash)
