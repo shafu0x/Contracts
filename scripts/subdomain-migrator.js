@@ -1,6 +1,7 @@
 const namehash = require('eth-ens-namehash')
 
 const ensAbi = require('../resources/ens_abi.json')
+const publicResolverAbi = require('../resources/public_resolver_abi.json')
 const tokenData = require('../data/tokens.json')
 
 const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
@@ -13,8 +14,12 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   let resolverAddr = await ethers.provider.resolveName("resolver.eth")
+  // let resolverAddr = await ethers.provider.resolveName("resolver.eth")
+  let resolverAddr = "0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329"
+  console.log(resolverAddr, "0x4b1488b7a6b320d2d721406204abc3eeaa9ad329")
 
   const ensContract = new ethers.Contract(ensAddress, ensAbi, deployer)
+  const resolverContract = new ethers.Contract(resolverAddr, publicResolverAbi, deployer)
 
   let pendingTokens = [];
 
@@ -48,6 +53,10 @@ async function main() {
       let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0)
     }
   }
+
+  let normalizedTicker = namehash.normalize(subdomain)
+  let fullNode = namehash.hash(`${subdomain}.tkn.eth`)
+  let newSubdomainAddrTx = await resolverContract.setAddr(node, deployer.address)
 }
 
 main()
