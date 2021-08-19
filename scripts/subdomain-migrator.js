@@ -14,9 +14,6 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   let resolverAddr = await ethers.provider.resolveName("resolver.eth")
-  // let resolverAddr = await ethers.provider.resolveName("resolver.eth")
-  // let resolverAddr = "0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329"
-  // console.log(resolverAddr, "0x4b1488b7a6b320d2d721406204abc3eeaa9ad329")
 
   const ensContract = new ethers.Contract(ensAddress, ensAbi, deployer)
   const resolverContract = new ethers.Contract(resolverAddr, publicResolverAbi, deployer)
@@ -33,13 +30,10 @@ async function main() {
     }
   }
 
-  console.log(pendingTokens)
-
   for (let [, token] of Object.entries(pendingTokens)) {
     if (token.failed_qa == true) {
       console.log("Skipping", token.name, "which failed QA")
     } else {
-      console.log(token)
       let normalizedTicker = namehash.normalize(token.ticker)
       let resolvedName = await ethers.provider.resolveName(`${normalizedTicker}.tkn.eth`)
       console.log("resolvedName:", resolvedName, token.ticker)
