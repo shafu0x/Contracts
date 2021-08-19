@@ -15,8 +15,8 @@ async function main() {
 
   let resolverAddr = await ethers.provider.resolveName("resolver.eth")
   // let resolverAddr = await ethers.provider.resolveName("resolver.eth")
-  let resolverAddr = "0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329"
-  console.log(resolverAddr, "0x4b1488b7a6b320d2d721406204abc3eeaa9ad329")
+  // let resolverAddr = "0x4B1488B7a6B320d2D721406204aBc3eeAa9AD329"
+  // console.log(resolverAddr, "0x4b1488b7a6b320d2d721406204abc3eeaa9ad329")
 
   const ensContract = new ethers.Contract(ensAddress, ensAbi, deployer)
   const resolverContract = new ethers.Contract(resolverAddr, publicResolverAbi, deployer)
@@ -42,21 +42,29 @@ async function main() {
       console.log(token)
       let normalizedTicker = namehash.normalize(token.ticker)
       let resolvedName = await ethers.provider.resolveName(`${normalizedTicker}.tkn.eth`)
-      console.log(resolvedName, token.ticker)
+      console.log("resolvedName:", resolvedName, token.ticker)
 
-      let subdomainLabel = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(normalizedTicker))
-      console.log("subdomainLabel", subdomainLabel)
+      if (!resolvedName) {
+        console.log(normalizedTicker, "not set. Registering and configuring addr.", )
 
-      let node = namehash.hash('tkn.eth') 
-      console.log("node", node)
+        let subdomainLabel = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(normalizedTicker))
+        console.log("subdomainLabel", subdomainLabel)
 
-      let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0)
+        let node = namehash.hash('tkn.eth') 
+        console.log("node", node)
+
+        let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0)
+        console.log("Waiting for", normalizedTicker, "subnodeRecord transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainTx.hash)
+        await ethers.provider.waitForTransaction(newSubdomainTx.hash, 1);
+
+        let fullNode = namehash.hash(`${normalizedTicker}.tkn.eth`)
+        let newSubdomainAddrTx = await resolverContract.setAddr(fullNode, token.mainnet_contract_address, { gasLimit: 200000, gasPrice: 20000000000 })
+
+        console.log("Waiting for", normalizedTicker, "setAddr transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainAddrTx.hash)
+        await ethers.provider.waitForTransaction(newSubdomainAddrTx.hash, 1);
+      }
     }
   }
-
-  let normalizedTicker = namehash.normalize(subdomain)
-  let fullNode = namehash.hash(`${subdomain}.tkn.eth`)
-  let newSubdomainAddrTx = await resolverContract.setAddr(node, deployer.address)
 }
 
 main()
