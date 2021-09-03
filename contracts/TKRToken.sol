@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
-contract TickerDao is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit, ERC20Votes {
-    constructor() ERC20("TickerDao", "TKR") ERC20Permit("TickerDao") {
+contract TKRToken is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit, ERC20Votes {
+    constructor() ERC20("TKRToken", "TKR") ERC20Permit("TKRToken") {
         _mint(msg.sender, 100000 * 10 ** decimals());
     }
 
