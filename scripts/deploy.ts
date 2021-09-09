@@ -27,14 +27,12 @@ async function main() {
   console.log(deployer.address.toString())
 
   // Clobber merkleresult data to be able to dynamically include deployer address for testing
-  // var airdropData = JSON.parse(`{ "${deployer.address.toString()}": "100" }`)
+  var airdropData = JSON.parse(`{ "${deployer.address.toString()}": 100 }`)
 
   const merkleResult = parseBalanceMap(airdropData)
-  const tree = new BalanceTree(merkleResult);
 
-  console.log(tree)
-  
   const merkleRoot = merkleResult.merkleRoot
+  const tree = merkleResult.tree
 
   console.log("MerkleRoot:", merkleRoot)
 
@@ -42,7 +40,7 @@ async function main() {
     "MerkleDistributor"
   );
   const merkleDistributor = await MerkleDistributor.deploy(
-    ticker.address,
+    tkrToken.address,
     merkleRoot //dynamically calculate merkle root here with eoa used for testing
   );
 
@@ -62,11 +60,22 @@ async function main() {
   const airdropIndex = merkleResult.claims[deployer.address].index
   console.log(airdropData)
   // return
+  // const tree = new BalanceTree(airdropData);
   const proof = tree.getProof(airdropIndex, deployer.address, amount);
 
-  merkleDistributor.claim(0, deployer.address, 100, proof)
+  console.log("merkleDistributor contract token address:", await merkleDistributor.token())
+  console.log("merkleDistributor stored merkle root", await merkleDistributor.merkleRoot())
+  // console.log("merkleDistributor TKR balance", await .merkleRoot())
 
-  console.log("Deployer address TKN balance", await tkrToken.balanceOf(deployer.address))
+  console.log("Check if address is claimed:", await merkleDistributor.isClaimed(0))
+
+  await merkleDistributor.claim(0, deployer.address, "100", proof)
+
+  const newBalance = await tkrToken.balanceOf(deployer.address)
+  const newBalanceNum = parseInt(newBalance._hex, 16)
+
+  console.log("Check if address is claimed:", await merkleDistributor.isClaimed(0))
+  console.log("Deployer address TKN balance", newBalance)
   // Test airdrop claim function
   // todo configure claim eoa address
 }

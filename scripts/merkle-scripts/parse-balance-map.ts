@@ -19,7 +19,8 @@ interface MerkleDistributorInfo {
         [flag: string]: boolean
       }
     }
-  }
+  },
+  tree: BalanceTree
 }
 
 type OldFormat = { [account: string]: number | string }
@@ -88,5 +89,6 @@ export function parseBalanceMap(balances: OldFormat | NewFormat[]): MerkleDistri
     merkleRoot: tree.getHexRoot(),
     tokenTotal: tokenTotal.toHexString(),
     claims,
+    tree: tree
   }
 }
