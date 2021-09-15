@@ -52,3 +52,36 @@ export const Button = styled.button`
     outline: none;
   }
 `;
+
+export const Claim = styled.div`
+  border: 5px solid #171717;
+  height: 100px;
+  background-color: #282c34;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const MidHeader = styled.h3`
+
+`
+
+export const ModalButton = styled.button`
+  background-color: white;
+  border: none;
+  border-radius: 8px;
+  color: #282c34;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  padding: 12px 24px;
+  margin-left: auto;
+  margin-right: auto;
+  align-self: flex-end;
+
+  ${props => props.hidden && "hidden"} :focus {
+    border: none;
+    outline: none;
+  }
+`;
