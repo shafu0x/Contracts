@@ -6,6 +6,7 @@ const publicResolverAbi = require('../resources/public_resolver_abi.json')
 const erc20Abi = require('../resources/erc20_abi.json')
 
 const tokenData = require('../data/seed_erc20s.json')
+const expandedTokenData = require('../data/final-final-migration-data.json')
 
 const subdomainConfigAbi = require('../resources/subdomain_config_abi.json')
 
@@ -51,20 +52,28 @@ async function main() {
   for (let [key, token] of Object.entries(tokenData)) {
     for (let [key, token_contract] of Object.entries(token.token_contracts)) {
       if (token_contract.chain_id == 1) {
+
+        // Check to see if tokens are in seed token data before running (first migration)
+        for (let [key, expandedToken] of Object.entries(expandedTokenData)) {
+          if (expandedToken.contract == token_contract.contract_address) {
+            pendingTokens.push(expandedToken)
+          }
+        }
+
         // console.log(key, token_contract.contract_address);
-        token.mainnet_contract_address = token_contract.contract_address
-        pendingTokens.push(token)
+        // token.mainnet_contract_address = token_contract.contract_address
+        // pendingTokens.push(token)
       }
     }
   }
 
   for (let [, token] of Object.entries(pendingTokens)) {
     if (token.failed_qa == true) {
-      console.log("Skipping", token.name, "which failed QA")
+      console.log("Skipping", token.verbose.data.name, "which failed QA")
     } else {
-      let normalizedTicker = namehash.normalize(token.ticker)
+      let normalizedTicker = namehash.normalize(token.verbose.data.symbol)
       let resolvedName = await ethers.provider.resolveName(`${normalizedTicker}.tkn.eth`)
-      console.log("resolvedName:", resolvedName, token.ticker)
+      console.log("resolvedName:", resolvedName, token.verbose.data.symbol)
 
       if (!resolvedName) {
         console.log(normalizedTicker, "not set. Registering and configuring addr.", )
@@ -74,13 +83,13 @@ async function main() {
         let node = namehash.hash('tkn.eth')
         let fullNode = namehash.hash(`${normalizedTicker}.tkn.eth`)
 
-        let tokenContract = new ethers.Contract(token.mainnet_contract_address, erc20Abi, deployer)
+        let tokenContract = new ethers.Contract(token.contract, erc20Abi, deployer)
         let contractDecimals = await tokenContract.decimals();
 
         console.log("Decimals for", normalizedTicker, ":", contractDecimals)
 
-        console.log(subdomainLabel, domainOwner, fullNode, token.mainnet_contract_address)
-        let newSubdomainAddrTx = await subdomainConfigContract.configureSubdomainFully(subdomainLabel, domainOwner, fullNode, token.mainnet_contract_address, ["a", "b", "c", "d"], { gasLimit: 6000000, maxFeePerGas: gasPrice, maxPriorityFeePerGas: priorityFee })
+        console.log(subdomainLabel, domainOwner, fullNode, token.contract)
+        let newSubdomainAddrTx = await subdomainConfigContract.configureSubdomainFully(subdomainLabel, domainOwner, fullNode, token.contract, [token.url, token.avatar, `{\"rev\":0, \"decimals\":${contractDecimals}}`, token["com.twitter"], token["com.github"]], { gasLimit: 6000000, maxFeePerGas: gasPrice, maxPriorityFeePerGas: priorityFee })
 
         console.log("Waiting for", normalizedTicker, "configureSubdomain transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainAddrTx.hash)
         await ethers.provider.waitForTransaction(newSubdomainAddrTx.hash, 1);
