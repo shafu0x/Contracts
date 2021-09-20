@@ -42,7 +42,7 @@ contract SubdomainConfig is Ownable {
         address owner,
         bytes32 fullNameNode,
         address mainnetTokenAddress,
-        string[4] calldata metadata
+        string[5] calldata metadata
     ) onlyOwner public {
         
         ensRegistry.setSubnodeRecord(TKR_NAMEHASHED_NODE, tickerLabel, address(this), address(publicResolver), 0);
@@ -50,9 +50,9 @@ contract SubdomainConfig is Ownable {
         publicResolver.setText(fullNameNode, "url", metadata[0]);
         publicResolver.setText(fullNameNode, "avatar", metadata[1]);
         // publicResolver.setText(fullNameNode, "description", description);
-        // publicResolver.setText(fullNameNode, "notice", data.notice);
-        publicResolver.setText(fullNameNode, "com.twitter", metadata[2]);
-        publicResolver.setText(fullNameNode, "com.github", metadata[3]);
+        publicResolver.setText(fullNameNode, "notice", metadata[2]);
+        publicResolver.setText(fullNameNode, "com.twitter", metadata[3]);
+        publicResolver.setText(fullNameNode, "com.github", metadata[4]);
         ensRegistry.setSubnodeOwner(TKR_NAMEHASHED_NODE, tickerLabel, owner);
     }
 
