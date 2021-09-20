@@ -3,6 +3,8 @@ const { ethers } = require("hardhat");
 
 const ensAbi = require('../resources/ens_abi.json')
 const publicResolverAbi = require('../resources/public_resolver_abi.json')
+const erc20Abi = require('../resources/erc20_abi.json')
+
 const tokenData = require('../data/seed_erc20s.json')
 
 const subdomainConfigAbi = require('../resources/subdomain_config_abi.json')
@@ -71,6 +73,11 @@ async function main() {
         let subdomainLabel = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(normalizedTicker))
         let node = namehash.hash('tkn.eth')
         let fullNode = namehash.hash(`${normalizedTicker}.tkn.eth`)
+
+        let tokenContract = new ethers.Contract(token.mainnet_contract_address, erc20Abi, deployer)
+        let contractDecimals = await tokenContract.decimals();
+
+        console.log("Decimals for", normalizedTicker, ":", contractDecimals)
 
         console.log(subdomainLabel, domainOwner, fullNode, token.mainnet_contract_address)
         let newSubdomainAddrTx = await subdomainConfigContract.configureSubdomainFully(subdomainLabel, domainOwner, fullNode, token.mainnet_contract_address, ["a", "b", "c", "d"], { gasLimit: 6000000, maxFeePerGas: gasPrice, maxPriorityFeePerGas: priorityFee })
