@@ -1,6 +1,8 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+pragma experimental ABIEncoderV2;
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Interfaces.sol";
 
@@ -35,7 +37,26 @@ contract SubdomainConfig is Ownable {
         ensRegistry.setSubnodeOwner(TKR_NAMEHASHED_NODE, tickerLabel, owner);
     }
 
+    function configureSubdomainFully(
+        bytes32 tickerLabel,
+        address owner,
+        bytes32 fullNameNode,
+        address mainnetTokenAddress,
+        string[4] calldata metadata
+    ) onlyOwner public {
+        
+        ensRegistry.setSubnodeRecord(TKR_NAMEHASHED_NODE, tickerLabel, address(this), address(publicResolver), 0);
+        publicResolver.setAddr(fullNameNode, mainnetTokenAddress);
+        publicResolver.setText(fullNameNode, "url", metadata[0]);
+        publicResolver.setText(fullNameNode, "avatar", metadata[1]);
+        // publicResolver.setText(fullNameNode, "description", description);
+        // publicResolver.setText(fullNameNode, "notice", data.notice);
+        publicResolver.setText(fullNameNode, "com.twitter", metadata[2]);
+        publicResolver.setText(fullNameNode, "com.github", metadata[3]);
+        ensRegistry.setSubnodeOwner(TKR_NAMEHASHED_NODE, tickerLabel, owner);
+    }
+
     function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4){
         return bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
-    } 
+    }
 }
