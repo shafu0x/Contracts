@@ -26,13 +26,13 @@ const subdomainConfigAbi = require('../resources/subdomain_config_abi.json')
 // 9. Run the script with `npx hardhat run scripts/subdomain-migrator.js --network mainnet`
 // 10. Comment out the `waitForTransaction` await line if you want to populate the mempool and not wait for each transaction to finish
 
-const subdomainMigratorContractAddr = '0x311090a53dee0f08cf72311798121ff0b9db6796'
+const subdomainMigratorContractAddr = '0x31f0214C176640ba8320ED233AB7ED414633e091'
 
 const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
-const domainOwner = '0x9200d8eFF8d972C79d1F692D61219CC652b43E0A'
+const domainOwner = '0x3A7cbf0a90DC6755DdEE66886Dd26d4A6Ab64896'
 
-let gasPrice = 60000000000
-let priorityFee = 500000000
+let gasPrice = 30000000000
+let priorityFee = 1500000000
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -89,11 +89,9 @@ async function main() {
         console.log("Decimals for", normalizedTicker, ":", contractDecimals)
 
         console.log(subdomainLabel, domainOwner, fullNode, token.contract)
-        let newSubdomainAddrTx = await subdomainConfigContract.configureSubdomainFully(subdomainLabel, domainOwner, fullNode, token.contract, [token.url, token.avatar, `{\"rev\":0, \"decimals\":${contractDecimals}}`, token["com.twitter"], token["com.github"]], { gasLimit: 6000000, maxFeePerGas: gasPrice, maxPriorityFeePerGas: priorityFee })
+        let newSubdomainAddrTx = await subdomainConfigContract.configureSubdomainFully(subdomainLabel, domainOwner, fullNode, token.contract, [token.url, token.avatar, `{\"rev\":0, \"decimals\":${contractDecimals}}`, token["com.twitter"], token["com.github"]], { gasLimit: 1000000, maxFeePerGas: gasPrice, maxPriorityFeePerGas: priorityFee })
 
-        console.log("Waiting for", normalizedTicker, "configureSubdomain transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainAddrTx.hash)
-        await ethers.provider.waitForTransaction(newSubdomainAddrTx.hash, 1);
-        console.log(newSubdomainAddrTx)
+        console.log("Waiting for", normalizedTicker, "configureSubdomain transaction to mine at https://etherscan.io/tx/" + newSubdomainAddrTx.hash)
       }
     }
   }
