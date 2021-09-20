@@ -12,7 +12,7 @@ contract Ticker {
     }
 
     // Enter 'uni' to lookup uni.tkn.eth
-    function fetch(string calldata _name) public view returns (address) {
+    function addressFor(string calldata _name) public view returns (address) {
         bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
         namehash = keccak256(
             abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
@@ -26,6 +26,41 @@ contract Ticker {
         address resolverAddr = ens.resolver(namehash);
         PublicResolver resolver = PublicResolver(resolverAddr);
         return resolver.addr(namehash);
+    }
+
+    struct Metadata {
+        address contractAddress;
+        string url;
+        string avatar;
+        string description;
+        string notice;
+        string twitter;
+        string github;
+    }
+
+    function infoFor(string calldata _name) public view returns (Metadata memory) {
+        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
+        );
+        address resolverAddr = ens.resolver(namehash);
+        PublicResolver resolver = PublicResolver(resolverAddr);
+        return Metadata(
+            resolver.addr(namehash),
+            resolver.text(namehash, "url"),
+            resolver.text(namehash, "avatar"),
+            resolver.text(namehash, "description"),
+            resolver.text(namehash, "notice"),
+            resolver.text(namehash, "com.twitter"),
+            resolver.text(namehash, "com.github")
+        );
+
     }
     
     // Calculate the namehash offchain using eth-ens-namehash to save gas costs.
