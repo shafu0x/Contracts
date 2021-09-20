@@ -1,24 +1,48 @@
 const namehash = require('eth-ens-namehash')
+const { ethers } = require("hardhat");
 
 const ensAbi = require('../resources/ens_abi.json')
 const publicResolverAbi = require('../resources/public_resolver_abi.json')
 const tokenData = require('../data/seed_erc20s.json')
 
-const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
+const subdomainConfigAbi = require('../resources/subdomain_config_abi.json')
 
-let gasPrice = 20000000000
+// Detailed instructions for running this script
+// 1. Compile contract in remix or wherever
+// 1. NOTE The address that deployed the contract will be the owner and therefore the only account that can query this contract
+// 2. Paste ABI into resources/subdomain_config_abi.json
+// 3. Paste deployed contract address into subdomainMigratorContractAddr variable below
+// 4. Set the controller of tkn.eth to the contract address, the same as you just pasted into subdomainMigratorContractAddr
+// 4-A Use https://app.ens.domains/name/tkn.eth/details to set the controller
+// 5. Paste the private key for the migration address you will be using in the MAIN_HOT_KEY variable in `hardhat.config.js`
+// 5-B Paste the private key into GOERLI_PRIVATE_KEY if you are testing on Goerli
+// 5-C Deposit the desired amount of eth for gas into that migrator address
+// 6. Set the url or the api key for the rpc provider you will use on Goerli or Mainnet in `hardhat.config.js`
+// 7. Set the max gas price you are willing to spend in the gasPrice variable below
+// 8. Configure your dataset
+// 9. Run the script with `npx hardhat run scripts/subdomain-migrator.js --network mainnet`
+// 10. Comment out the `waitForTransaction` await line if you want to populate the mempool and not wait for each transaction to finish
+
+const subdomainMigratorContractAddr = '0x311090a53dee0f08cf72311798121ff0b9db6796'
+
+const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
+const domainOwner = '0x9200d8eFF8d972C79d1F692D61219CC652b43E0A'
+
+let gasPrice = 60000000000
+let priorityFee = 500000000
 
 async function main() {
   const [deployer] = await ethers.getSigners();
 
   console.log("Deploying contracts with the account:", deployer.address);
-
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   let resolverAddr = await ethers.provider.resolveName("resolver.eth")
 
   const ensContract = new ethers.Contract(ensAddress, ensAbi, deployer)
-  const resolverContract = new ethers.Contract(resolverAddr, publicResolverAbi, deployer)
+  // const resolverContract = new ethers.Contract(resolverAddr, publicResolverAbi, deployer)
+
+  const subdomainConfigContract = new ethers.Contract(subdomainMigratorContractAddr, subdomainConfigAbi, deployer)
 
   let pendingTokens = [];
 
@@ -43,19 +67,17 @@ async function main() {
       if (!resolvedName) {
         console.log(normalizedTicker, "not set. Registering and configuring addr.", )
 
+        // Encode your domain strings for the blockchain
         let subdomainLabel = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(normalizedTicker))
-
-        let node = namehash.hash('tkn.eth') 
-
-        let newSubdomainTx = await ensContract.setSubnodeRecord(node, subdomainLabel, deployer.address, resolverAddr, 0, { gasPrice: gasPrice })
-        console.log("Waiting for", normalizedTicker, "subnodeRecord transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainTx.hash)
-        await ethers.provider.waitForTransaction(newSubdomainTx.hash, 1);
-
+        let node = namehash.hash('tkn.eth')
         let fullNode = namehash.hash(`${normalizedTicker}.tkn.eth`)
-        let newSubdomainAddrTx = await resolverContract.setAddr(fullNode, token.mainnet_contract_address, { gasLimit: 200000, gasPrice: gasPrice })
 
-        console.log("Waiting for", normalizedTicker, "setAddr transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainAddrTx.hash)
+        console.log(subdomainLabel, domainOwner, fullNode, token.mainnet_contract_address)
+        let newSubdomainAddrTx = await subdomainConfigContract.configureSubdomainFully(subdomainLabel, domainOwner, fullNode, token.mainnet_contract_address, ["a", "b", "c", "d"], { gasLimit: 6000000, maxFeePerGas: gasPrice, maxPriorityFeePerGas: priorityFee })
+
+        console.log("Waiting for", normalizedTicker, "configureSubdomain transaction to mine at https://goerli.etherscan.io/tx/" + newSubdomainAddrTx.hash)
         await ethers.provider.waitForTransaction(newSubdomainAddrTx.hash, 1);
+        console.log(newSubdomainAddrTx)
       }
     }
   }
