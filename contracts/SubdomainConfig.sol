@@ -21,6 +21,7 @@ contract SubdomainConfig is Ownable {
     bytes32 constant RESOLVER_DOT_ETH_NAMEHASHED_NODE = 0xfdd5d5de6dd63db72bbc2d487944ba13bf775b50a80805fe6fcaba9b0fba88f5;
 
     constructor() {
+        // ENS Registry is the same address on mainnet and testnets
         ensRegistry = ENSRegistryWithFallback(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
         
         publicResolversResolver = PublicResolver(ensRegistry.resolver(RESOLVER_DOT_ETH_NAMEHASHED_NODE));
