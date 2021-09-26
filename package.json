@@ -16,10 +16,11 @@
     "eth-ens-namehash": "^2.0.8",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.4",
-    "hardhat": "^2.6.0"
+    "hardhat": "^2.6.0",
+    "hardhat-abi-exporter": "^2.3.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/contracts": "^4.3.2",
     "@remix-project/remixd": "^0.5.1",
     "ts-node": "^10.2.1"
   }
