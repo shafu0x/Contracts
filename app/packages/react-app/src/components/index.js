@@ -55,7 +55,6 @@ export const Button = styled.button`
 
 export const Claim = styled.div`
   border: 5px solid #171717;
-  height: 100px;
   background-color: #282c34;
   text-align: center;
   display: flex;

@@ -34,7 +34,7 @@ async function performClaimQuery(updateTokenBalance) {
   console.log({ tokenBalance: tokenBalance.toString() });
 
   updateTokenBalance(tokenBalance.toString());
-  
+
   ethers.utils.parseEther("1.0")
   console.log(ethers)
   // const provider = new ethers.providers.Web3Provider(defaultProvider)
@@ -44,23 +44,44 @@ async function performClaimQuery(updateTokenBalance) {
 
 
   const provider = new ethers.providers.Web3Provider(window.ethereum)
-  const coolProvider = new ethers.providers.Def
+  const signer = provider.getSigner()
+  // let myAddress = await signer.getAddress()
+  // console.log("My address is", myAddress)
 
-// The Metamask plugin also allows signing transactions to
-// send ether and pay to change state within the blockchain.
-// For this, you need the account signer...
-  const signer = coolProvider.getSigner()
-  
-  console.log(await signer.getAddress())
+  // const coolProvider = new ethers.providers.Def
 
-  console.log("d")
-}
+  // The Metamask plugin also allows signing transactions to
+  // send ether and pay to change state within the blockchain.
+  // For this, you need the account signer...
+  // const signer = coolProvider.getSigner()
 
-async function populateUIState() {
+  // console.log(await signer.getAddress())
 
+  // console.log("d")
+
+  // Subscribe to accounts change
+  provider.on("accountsChanged", (accounts) => {
+    console.log("Accounts", accounts);
+  });
+
+  // Subscribe to chainId change
+  provider.on("chainChanged", (chainId) => {
+    console.log("chainid", chainId);
+  });
+
+  // Subscribe to session disconnection
+  provider.on("disconnect", (code, reason) => {
+    console.log("disconnect event", code, reason);
+  });
 }
 
 function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal }) {
+  // let address = ''
+  // if (provider) {
+  //   let signer = await provider.getSigner();
+  //   let address = await signer.getAddress();
+  // }
+
   return (
     <Button
       onClick={() => {
@@ -72,97 +93,157 @@ function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal }) {
         // populateUIState(provider)
       }}
     >
-      {!provider ? "Connect Wallet" : "Disconnect Wallet"}
+      {!provider ? "Connect Wallet" : "Disconnect " + (userAddress ? userAddress.slice(0, 6) + '...' + userAddress.slice(userAddress.length - 4, userAddress.length) : userAddress)}
     </Button>
   );
 }
 
 function ClaimButton({ label, updateTokenBalance }) {
   return (
-    <ModalButton onClick={() => performClaimQuery(updateTokenBalance)}>
+    <ModalButton onClick={() => performClaimQuery(updateTokenBalance)}
+      style={{ marginBottom: 10, marginTop: 10 }}
+    >
       {label}
     </ModalButton>
   )
 }
 
-var state = "safdfsfsd"
+async function getWalletData(provider, setTokenBalance) {
+  let signer = await provider.getSigner();
+  let address = await signer.getAddress();
+  userAddress = address;
+  
+  // GET BALANCE, CHECK IF ADDRESS HAS BEEN CLAIMED AND CHECK IF ADDRESS IS CLAIMABLE HERE
+
+  const ceaErc20 = new Contract(addresses.ceaErc20, abis.erc20, provider);
+  // A pre-defined address that owns some CEAERC20 tokens
+  tokenBalance = await ceaErc20.balanceOf(address);
+
+  setTokenBalance(tokenBalance.toString())
+
+  renderWalletData(signer, address)
+}
+
+function renderWalletData(signer, address) {
+  console.log(signer, address)
+}
+
+var userAddress = null
+var tokenBalance = null
 
 function App() {
-  const { loading, error, data } = useQuery(GET_TRANSFERS);
+  // const { loading, error, data } = useQuery(GET_TRANSFERS);
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tokenBalance, setTokenBalance] = useState(null);
   var greeter = "";
 
-  React.useEffect(() => {
-    if (!loading && !error && data && data.transfers) {
-      console.log({ transfers: data.transfers });
-    }
-  }, [loading, error, data]);
+  // this.state = {
+  //   userAddress: null
+  // }
+
+  // React.useEffect(() => {
+  //   if (!loading && !error && data && data.transfers) {
+  //     console.log({ transfers: data.transfers });
+  //   }
+  // }, [loading, error, data]);
+
+  if (provider) {
+    getWalletData(provider, setTokenBalance);
+  }
+
+  // handleUserAddressChange(userAddress); {
+  //   this.setState({
+  //     userAddress: userAddress
+  //   });
+  // }
+
+  if (isLoggedIn) {
+    // Subscribe to accounts change
+    provider.on("accountsChanged", (accounts) => {
+      console.log("Accounts", accounts);
+    });
+
+    // Subscribe to chainId change
+    provider.on("chainChanged", (chainId) => {
+      console.log("chainid", chainId);
+    });
+
+    // Subscribe to session disconnection
+    provider.on("disconnect", (code, reason) => {
+      console.log("disconnect event", code, reason);
+    });
+  }
 
   return (
     <div>
       <Header>
+        <div>Balance: {tokenBalance} TKR</div>
         <WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
       </Header>
       <Body>
         <Page-wrapper class='some-page-wrapper'>
           <div className='row'>
-            <div className='column'>
+            <div className='column claim-box'>
               <div className='blue-column'>
-                Some copy {greeter} {tokenBalance}
+                <h2 className="header-text">Claim TKR</h2>
+                {greeter} {tokenBalance}
               </div>
             </div>
-            <div className='column'>
-              <Claim>
-                <title-text>1,000 TKR</title-text>
-                <ClaimButton label={"Claim TKR"} updateTokenBalance={setTokenBalance} />
-              </Claim>
+            <div className='column claim-div'>
+              <title-text>1,000 TKR</title-text>
+              TKR has arrived
+              <ClaimButton label={"Claim your TKR tokens"} updateTokenBalance={setTokenBalance} />
+              {/* <Claim>
+              </Claim> */}
             </div>
           </div>
           <div className='row'>
-            <div className='double-column'>
+            <div className='double-column top-margin'>
               <div className='blue-column'>
+                <h2 className='balance-label'>Your balance: {tokenBalance} TKR</h2>
                 <MidHeader>What can I do with my airdrop?</MidHeader>
               </div>
             </div>
           </div>
-          <div className='row'>
+          {/* <div className='row'>
             <div className='column'>
               <div className='green-column'>
-                Some Text in Row 2, Column One
+                <h5>Governance</h5>
+                TickerDao is focused on expanding the dataset and 
               </div>
             </div>
             <div className='column'>
               <div className='orange-column'>
-                Some Text in Row 2, Column Two
+                Staking
               </div>
             </div>
-          </div>
-          <div className='row'>
+          </div> */}
+          {/* <div className='row'>
             <div className='double-column'>
               <div className='blue-column'>
-                Some Text in row 3 double column 1
+                <h3>What can I do with my airdrop?</h3>
+
               </div>
             </div>
-          </div>
+          </div> */}
         </Page-wrapper>
-        <Image src={logo} alt="react-logo" />
-        <p>
+        {/* <Image src={logo} alt="react-logo" /> */}
+        {/* <p>
           Edit <code>packages/react-app/src/App.js</code> and save to reload.
-        </p>
-        <title-text> $TKR </title-text>
-        <title-text>$TickerDao airdrop claim</title-text>
+        </p> */}
+        {/* <title-text> $TKR </title-text>
+        <title-text>$TickerDao airdrop claim</title-text> */}
         {/* Remove the "hidden" prop and open the JavaScript console in the browser to see what this function does */}
-        <Button onClick={() => readOnChainData()}>
+        {/* <Button onClick={() => readOnChainData()}>
           Read On-Chain Balance
-        </Button>
-        <Link href="https://ethereum.org/developers/#getting-started" style={{ marginTop: "8px" }}>
+        </Button> */}
+        {/* <Link href="https://ethereum.org/developers/#getting-started" style={{ marginTop: "8px" }}>
           Learn Ethereum
         </Link>
         <Link href="https://reactjs.org">Learn React</Link>
-        <Link href="https://thegraph.com/docs/quick-start">Learn The Graph</Link>
+        <Link href="https://thegraph.com/docs/quick-start">Learn The Graph</Link> */}
       </Body>
     </div>
   );

@@ -22,6 +22,7 @@ code {
 title-text {
   font-family: tickerFont;
   color: #FFCE49;
+  font-size: 1.5em;
 }
 
 
@@ -50,7 +51,7 @@ title-text {
 
 .blue-column {
   /* background-color: blue; */
-  /* height: 100px; */
+  height: auto !important;
 }
 
 .green-column {
@@ -72,4 +73,31 @@ title-text {
   .double-column {
     flex: 2
   }
+}
+
+.header-text {
+  font-family: tickerFont;
+  color: #FFCE49;
+  margin-top: 0px;
+}
+
+.top-margin {
+  margin-top: 1em;
+}
+
+.claim-box {
+  height: 200px;
+  min-width: 320px;
+}
+
+.claim-div {
+  border: 5px solid #171717;
+  background-color: #282c34;
+  text-align: center;
+  padding-top: 1em;
+  min-width: 320px;
+}
+
+.balance-label {
+  text-align: center;
 }
