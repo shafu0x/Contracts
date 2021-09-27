@@ -108,7 +108,7 @@ function ClaimButton({ label, updateTokenBalance }) {
   )
 }
 
-async function getWalletData(provider, setTokenBalance) {
+async function getWalletData(provider, setTokenBalance, currentTokenBalance) {
   let signer = await provider.getSigner();
   let address = await signer.getAddress();
   userAddress = address;
@@ -119,9 +119,15 @@ async function getWalletData(provider, setTokenBalance) {
   // A pre-defined address that owns some CEAERC20 tokens
   tokenBalance = await ceaErc20.balanceOf(address);
 
-  setTokenBalance(tokenBalance.toString())
+  let balanceString = tokenBalance / Math.pow(10, 18)
 
-  renderWalletData(signer, address)
+  console.log("Got balance", balanceString);
+
+  if (currentTokenBalance["balanceInt"]._hex != tokenBalance._hex) {
+    console.log("Setting token balance from", currentTokenBalance["balanceString"])
+    setTokenBalance({"balanceInt":tokenBalance, "balanceString":balanceString})
+  }
+  // renderWalletData(signer, address)
 }
 
 function renderWalletData(signer, address) {
@@ -136,7 +142,7 @@ function App() {
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [tokenBalance, setTokenBalance] = useState(null);
+  const [tokenBalance, setTokenBalance] = useState({"balanceInt":0, "balanceString":"0"});
   var greeter = "";
 
   // this.state = {
@@ -150,7 +156,7 @@ function App() {
   // }, [loading, error, data]);
 
   if (provider) {
-    getWalletData(provider, setTokenBalance);
+    getWalletData(provider, setTokenBalance, tokenBalance);
   }
 
   // handleUserAddressChange(userAddress); {
@@ -179,7 +185,7 @@ function App() {
   return (
     <div>
       <Header>
-        <div>Balance: {tokenBalance} TKR</div>
+        <div>Balance: {tokenBalance["balanceString"]} TKR</div>
         <WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
       </Header>
       <Body>
@@ -188,7 +194,7 @@ function App() {
             <div className='column claim-box'>
               <div className='blue-column'>
                 <h2 className="header-text">Claim TKR</h2>
-                {greeter} {tokenBalance}
+                {greeter} {tokenBalance["balanceString"]}
               </div>
             </div>
             <div className='column claim-div'>
@@ -202,7 +208,7 @@ function App() {
           <div className='row'>
             <div className='double-column top-margin'>
               <div className='blue-column'>
-                <h2 className='balance-label'>Your balance: {tokenBalance} TKR</h2>
+                <h2 className='balance-label'>Your balance: {tokenBalance["balanceString"]} TKR</h2>
                 <MidHeader>What can I do with my airdrop?</MidHeader>
               </div>
             </div>
