@@ -9,7 +9,7 @@ dataSources:
     network: mainnet
     source:
       abi: erc20
-      address: "0xDE082B779fa81C47f8759d77a125A7931EDEeA56"
+      address: "0xF7494A3298b1a6C2AFe60B3A3FD6389D7f400eA5"
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
