@@ -52,6 +52,8 @@ title-text {
 .blue-column {
   /* background-color: blue; */
   height: auto !important;
+  padding-right: 15px;
+  padding-left: 15px;
 }
 
 .green-column {
@@ -94,8 +96,11 @@ title-text {
   border: 5px solid #171717;
   background-color: #282c34;
   text-align: center;
-  padding-top: 1em;
+  padding-top: 14px;
   min-width: 320px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 30px;
 }
 
 .balance-label {
