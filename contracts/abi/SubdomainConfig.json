@@ -52,6 +52,39 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "tickerLabel",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "fullNameNode",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "mainnetTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string[5]",
+        "name": "metadata",
+        "type": "string[5]"
+      }
+    ],
+    "name": "configureSubdomainFully",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "ensRegistry",
     "outputs": [
