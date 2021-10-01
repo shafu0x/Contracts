@@ -1,6 +1,6 @@
 Instructions
 
-1. Create subdomains: detailed instructions in scripts/subdomain-migrator.js
+1. Create subdomains: **detailed instructions** in scripts/subdomain-migrator.js
 
 Run migrator
 ```
