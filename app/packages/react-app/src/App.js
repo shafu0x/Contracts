@@ -16,10 +16,12 @@ import { parseBalanceMap } from './merkle/parse-balance-map'
 import BalanceTree from './merkle/balance-tree'
 
 // const { default: userAirdrops } = import("./recipients.json");
-import userAirdrops from './recipients.json'
+import airdrops from './recipients.json'
 import { green } from "chalk";
 // import userAirdrops from './example.json'
-console.log(userAirdrops);
+
+const userAirdrops = airdrops;
+
 
 async function readOnChainData() {
   // Should replace with the end-user wallet, e.g. Metamask
@@ -33,7 +35,8 @@ async function readOnChainData() {
 }
 
 async function performClaimQuery(updateTokenBalance, provider, airdropIndex) {
-  console.log("claimmmm")
+  processClaim(provider);
+  // console.log("claimmmm")
   // Should replace with the end-user wallet, e.g. Metamask
   // const defaultProvider = getDefaultProvider();
   // Create an instance of an ethers.js Contract
@@ -45,14 +48,14 @@ async function performClaimQuery(updateTokenBalance, provider, airdropIndex) {
 
   // let { default: userAirdrops } = import("./recipients.json");
 
-  let signer = await provider.getSigner();
-  const merkleDistributor = new Contract(addresses.merkleDistributor, abis.merkleDistributor, signer);
+  // let signer = await provider.getSigner();
+  // const merkleDistributor = new Contract(addresses.merkleDistributor, abis.merkleDistributor, signer);
 
-  console.log("The airdrops:", userAirdrops)
-  const tree = new BalanceTree(userAirdrops)
-  // const proof = tree.getProof(airdropIndex, userAddress, 100)
-  const proof = tree.getProof(airdropIndex, userAddress, ethers.BigNumber.from(100))
-  let claimOutcome = await merkleDistributor.claim(airdropIndex, userAddress, ethers.BigNumber.from(100), proof)
+  // console.log("The airdrops:", userAirdrops)
+  // const tree = new BalanceTree(userAirdrops)
+  // // const proof = tree.getProof(airdropIndex, userAddress, 100)
+  // const proof = tree.getProof(airdropIndex, userAddress, ethers.BigNumber.from(100))
+  // let claimOutcome = await merkleDistributor.claim(airdropIndex, userAddress, ethers.BigNumber.from(100), proof)
 
   // let claimOutcome = await merkleDistributor.claim()
 
@@ -131,26 +134,65 @@ function ClaimButton({ label, updateTokenBalance, provider, airdropIndex }) {
   )
 }
 
-async function getWalletData(provider, setTokenBalance, currentTokenBalance, setClaim, setError, setStatus, setAirdropIndex) {
+async function getWalletData(provider, setTokenBalance, currentTokenBalance, setClaim, setError, setStatus, setAirdropIndex, claim) {
   let signer = await provider.getSigner();
   let address = await signer.getAddress();
   userAddress = address.toLowerCase();
   
   // GET BALANCE, CHECK IF ADDRESS HAS BEEN CLAIMED AND CHECK IF ADDRESS IS CLAIMABLE HERE
 
-  const merkleDistributor = new Contract(addresses.merkleDistributor, abis.merkleDistributor, provider);
+  const merkleDistributorTwo = new Contract(addresses.merkleDistributor, abis.merkleDistributor, provider);
 
   // let { default: userAirdrops } = import("./recipients.json")
 
-  let airdrop = userAirdrops.find(element => element[userAddress.toLowerCase()] == 100);
-  let claimIndex = userAirdrops.findIndex(element => airdrop);
-  let airdropAmount = airdrop[userAddress.toLowerCase()];
+
+  const merkleResult = parseBalanceMap(userAirdrops)
+
+  const merkleRoot = merkleResult.merkleRoot
+  const tree = merkleResult.tree
+
+  // console.log("MerkleRoot:", merkleRoot)
+
+  const merkleDistributor = new Contract(addresses.merkleDistributor, abis.merkleDistributor, signer);
+
+  const tkrToken = new Contract(addresses.ceaErc20, abis.erc20, provider);
+  // const MerkleDistributor = await ethers.getContractFactory(
+  //   "MerkleDistributor"
+  // );
+  // const merkleDistributor = await MerkleDistributor.deploy(
+  //   tkrToken.address,
+  //   merkleRoot, //dynamically calculate merkle root here with eoa used for testing
+  //   {gasLimit: 8000000, gasPrice: 20000000000}
+  // );
+
+  // console.log("Merkle distributor contract address:", merkleDistributor.address);
+
+  // Transfer tokens to merkle distributor for airdrop claims
+  // await tkrToken.transfer(merkleDistributor.address, ethers.utils.parseEther("100000"), {gasLimit: 8000000, gasPrice: 20000000000})
+
+  // console.log("MerkleDistributor TKN balance", await tkrToken.balanceOf(merkleDistributor.address))
+
+  // console.log(merkleResult)
+
+  // console.log(parseInt(merkleResult.claims[deployer.address].amount, 16))
+  // return;
+  // GENERATE MERKLE PROOF FOR CLAIM
+  // const amount = ethers.utils.parseEther(merkleResult.claims[deployer.address].amount);
+  const amount = merkleResult.claims[address].amount
+  // const amount = ethers.utils.parseEther(merkleResult.claims[deployer.address].amount.toString())
+  const airdropIndex = merkleResult.claims[address].index
+
+
+  console.log(userAirdrops)
+  // let airdrop = userAirdrops.find(element => element[userAddress.toLowerCase()] == 100);
+  // let claimIndex = userAirdrops.findIndex(element => airdrop);
+  // let airdropAmount = airdrop[userAddress.toLowerCase()];
 
   // var claimIndex = null;
   let isClaimed = null;
 
 
-  if (!airdropAmount) {
+  if (!amount) {
     setError("Your address was not found");
     return;
   } else {
@@ -159,15 +201,17 @@ async function getWalletData(provider, setTokenBalance, currentTokenBalance, set
     //   (drop) => drop[userAddress] == 100
     // );
 
-    isClaimed = await merkleDistributor.isClaimed(claimIndex);
-    console.log("isClaimed for ", claimIndex, isClaimed)
+    isClaimed = await merkleDistributorTwo.isClaimed(airdropIndex);
+    console.log("isClaimed for ", airdropIndex, isClaimed)
 
 
+    let tokensOwned = parseInt(amount) / 1000000000000000000
 
-    
-    setAirdropIndex(claimIndex)
-    setStatus(`🎉 You have ${airdropAmount} unclaimed TKR 🎉`)
-    setClaim(airdropAmount)
+    if (!claim) {
+      setAirdropIndex(airdropIndex)
+      setStatus(`🎉 You have ${tokensOwned} unclaimed TKR 🎉`)
+      setClaim(tokensOwned)
+    }
   }
 
   
@@ -194,7 +238,7 @@ async function getWalletData(provider, setTokenBalance, currentTokenBalance, set
   // renderWalletData(signer, address)
 }
 
-async function greenfield(provider) {
+async function processClaim(provider) {
   // const { ethers } = require("hardhat");
   const deployer = await provider.getSigner();
   const address = await deployer.getAddress();
@@ -314,14 +358,14 @@ function App() {
   //   }
   // }, [loading, error, data]);
 
-  if (provider) {
-    greenfield(provider);
-    // greenfield(provider, setTokenBalance, tokenBalance, setClaim, setError, setStatus, setAirdropIndex);
-  }
-
   // if (provider) {
-  //   getWalletData(provider, setTokenBalance, tokenBalance, setClaim, setError, setStatus, setAirdropIndex);
+  //   greenfield(provider);
+  //   // greenfield(provider, setTokenBalance, tokenBalance, setClaim, setError, setStatus, setAirdropIndex);
   // }
+
+  if (provider) {
+    getWalletData(provider, setTokenBalance, tokenBalance, setClaim, setError, setStatus, setAirdropIndex, claim);
+  }
 
   // handleUserAddressChange(userAddress); {
   //   this.setState({
