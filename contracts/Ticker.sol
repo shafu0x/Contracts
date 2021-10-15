@@ -71,4 +71,10 @@ contract Ticker {
         PublicResolver resolver = PublicResolver(resolverAddr);
         return resolver.addr(namehash);
     }
+        
+    // Get an account's balance using a ticker symbol
+    function balanceWithTicker(address user, string calldata tickerSymbol) public view returns (uint) {
+        IERC20 tokenContract = IERC20(addressFor(tickerSymbol));
+        return tokenContract.balanceOf(user);
+    }
 }
