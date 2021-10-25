@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "./Interfaces.sol";
 
@@ -30,6 +30,7 @@ contract Ticker {
 
     struct Metadata {
         address contractAddress;
+        string name;
         string url;
         string avatar;
         string description;
@@ -53,6 +54,7 @@ contract Ticker {
         PublicResolver resolver = PublicResolver(resolverAddr);
         return Metadata(
             resolver.addr(namehash),
+            resolver.text(namehash, "name"),
             resolver.text(namehash, "url"),
             resolver.text(namehash, "avatar"),
             resolver.text(namehash, "description"),
