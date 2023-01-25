@@ -3,4 +3,4 @@
 For API documentation, see: [tkn.eth/#developer-docs-start](https://tkn.eth.limo/#developer-docs-start)
 
 ### Contract Locations:  
-Ticker.sol - Mainnet: [0x8F5007bCDC1870531029C194b31AE1e6005bc30d](https://etherscan.io/address/0x8F5007bCDC1870531029C194b31AE1e6005bc30d#code)
+TNS.sol - Mainnet: [0xcd2DcAC10e640e391C27F8b24894cf24B8fB0187](https://etherscan.io/address/0xcd2DcAC10e640e391C27F8b24894cf24B8fB0187#code)
