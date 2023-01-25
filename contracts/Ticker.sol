@@ -6,8 +6,6 @@ import "./Interfaces.sol";
 contract TNS {
     ENSRegistryWithFallback ens;
 
-    bytes32 tknNode = 0xf6c9dc88e6a4afa9f34c1e9869cc16ecda6b1abe776be053dc8e92fc8722794c;
-
     constructor() {
         ens = ENSRegistryWithFallback(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e); 
         // The ens registry address is shared across testnets and mainnet
@@ -76,18 +74,18 @@ contract TNS {
             resolver.text(namehash, "notice"),
             resolver.text(namehash, "com.twitter"),
             resolver.text(namehash, "com.github"),
-            bytesToAddress(resolver.addr(tknNode, 2147525809)), // ARB1trum
-            bytesToAddress(resolver.addr(tknNode, 2147526762)), // AVAXC
-            bytesToAddress(resolver.addr(tknNode, 2147483704)), // BSC
-            bytesToAddress(resolver.addr(tknNode, 2147483673)), // CRO
-            bytesToAddress(resolver.addr(tknNode, 2147483898)), // FTM
-            bytesToAddress(resolver.addr(tknNode, 2147483748)), // GNO
-            bytesToAddress(resolver.addr(tknNode, 2147483785)), // MATIC Polygon
-            resolver.addr(tknNode, 397), // NEAR
-            bytesToAddress(resolver.addr(tknNode, 2147483658)), // OP
-            resolver.addr(tknNode, 501), // SOL
-            resolver.addr(tknNode, 195), // TRX
-            resolver.addr(tknNode, 119)  // ZIL
+            bytesToAddress(resolver.addr(namehash, 2147525809)), // ARB1trum
+            bytesToAddress(resolver.addr(namehash, 2147526762)), // AVAXC
+            bytesToAddress(resolver.addr(namehash, 2147483704)), // BSC
+            bytesToAddress(resolver.addr(namehash, 2147483673)), // CRO
+            bytesToAddress(resolver.addr(namehash, 2147483898)), // FTM
+            bytesToAddress(resolver.addr(namehash, 2147483748)), // GNO
+            bytesToAddress(resolver.addr(namehash, 2147483785)), // MATIC Polygon
+            resolver.addr(namehash, 397), // NEAR
+            bytesToAddress(resolver.addr(namehash, 2147483658)), // OP
+            resolver.addr(namehash, 501), // SOL
+            resolver.addr(namehash, 195), // TRX
+            resolver.addr(namehash, 119)  // ZIL
         );
     }
 
@@ -105,7 +103,7 @@ contract TNS {
         );
         address resolverAddr = ens.resolver(namehash);
         PublicResolver resolver = PublicResolver(resolverAddr);
-        return resolver.addr(tknNode, _chainId);
+        return resolver.addr(namehash, _chainId);
     }
     
     // Calculate the namehash offchain using eth-ens-namehash to save gas costs.
