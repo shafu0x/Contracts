@@ -1,10 +1,12 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import "./Interfaces.sol";
 
-contract Ticker {
+contract TNS {
     ENSRegistryWithFallback ens;
+
+    bytes32 tknNode = 0xf6c9dc88e6a4afa9f34c1e9869cc16ecda6b1abe776be053dc8e92fc8722794c;
 
     constructor() {
         ens = ENSRegistryWithFallback(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e); 
@@ -37,6 +39,18 @@ contract Ticker {
         string notice;
         string twitter;
         string github;
+        address payable arb1_address;
+        address payable avaxc_address;
+        address payable bsc_adress;
+        address payable cro_address;
+        address payable ftm_address;
+        address payable gno_address;
+        address payable matic_address;
+        bytes near_address;
+        address payable op_address;
+        bytes sol_address;
+        bytes trx_address;
+        bytes zil_address; 
     }
 
     function infoFor(string calldata _name) public view returns (Metadata memory) {
@@ -52,6 +66,7 @@ contract Ticker {
         );
         address resolverAddr = ens.resolver(namehash);
         PublicResolver resolver = PublicResolver(resolverAddr);
+
         return Metadata(
             resolver.addr(namehash),
             resolver.text(namehash, "name"),
@@ -60,9 +75,37 @@ contract Ticker {
             resolver.text(namehash, "description"),
             resolver.text(namehash, "notice"),
             resolver.text(namehash, "com.twitter"),
-            resolver.text(namehash, "com.github")
+            resolver.text(namehash, "com.github"),
+            bytesToAddress(resolver.addr(tknNode, 2147525809)), // ARB1trum
+            bytesToAddress(resolver.addr(tknNode, 2147526762)), // AVAXC
+            bytesToAddress(resolver.addr(tknNode, 2147483704)), // BSC
+            bytesToAddress(resolver.addr(tknNode, 2147483673)), // CRO
+            bytesToAddress(resolver.addr(tknNode, 2147483898)), // FTM
+            bytesToAddress(resolver.addr(tknNode, 2147483748)), // GNO
+            bytesToAddress(resolver.addr(tknNode, 2147483785)), // MATIC Polygon
+            resolver.addr(tknNode, 397), // NEAR
+            bytesToAddress(resolver.addr(tknNode, 2147483658)), // OP
+            resolver.addr(tknNode, 501), // SOL
+            resolver.addr(tknNode, 195), // TRX
+            resolver.addr(tknNode, 119)  // ZIL
         );
+    }
 
+    // Get chain ID here: https://github.com/ensdomains/address-encoder
+    function getContractForChain(uint256 _chainId, string calldata _name) public view returns (bytes memory) {
+        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
+        );
+        address resolverAddr = ens.resolver(namehash);
+        PublicResolver resolver = PublicResolver(resolverAddr);
+        return resolver.addr(tknNode, _chainId);
     }
     
     // Calculate the namehash offchain using eth-ens-namehash to save gas costs.
@@ -78,5 +121,20 @@ contract Ticker {
     function balanceWithTicker(address user, string calldata tickerSymbol) public view returns (uint) {
         IERC20 tokenContract = IERC20(addressFor(tickerSymbol));
         return tokenContract.balanceOf(user);
+    }
+
+    // Helpers
+    function bytesToAddress(bytes memory b)
+        internal
+        pure
+        returns (address payable a)
+    {
+        if (b.length == 20) {
+            assembly {
+                a := div(mload(add(b, 32)), exp(256, 12))
+            }
+        } else {
+            return payable(address(0));
+        }
     }
 }
