@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.17;
 
 import "./Interfaces.sol";
 
@@ -37,9 +37,10 @@ contract TNS {
         string notice;
         string twitter;
         string github;
+        bytes contenthash;
         address payable arb1_address;
         address payable avaxc_address;
-        address payable bsc_adress;
+        address payable bsc_address;
         address payable cro_address;
         address payable ftm_address;
         address payable gno_address;
@@ -74,6 +75,7 @@ contract TNS {
             resolver.text(namehash, "notice"),
             resolver.text(namehash, "com.twitter"),
             resolver.text(namehash, "com.github"),
+            resolver.contenthash(namehash),
             bytesToAddress(resolver.addr(namehash, 2147525809)), // ARB1trum
             bytesToAddress(resolver.addr(namehash, 2147526762)), // AVAXC
             bytesToAddress(resolver.addr(namehash, 2147483704)), // BSC
