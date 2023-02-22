@@ -37,7 +37,7 @@ contract TNS {
         string notice;
         string twitter;
         string github;
-        bytes contenthash;
+        bytes dweb;
         address payable arb1_address;
         address payable avaxc_address;
         address payable bsc_address;
@@ -50,9 +50,40 @@ contract TNS {
         bytes sol_address;
         bytes trx_address;
         bytes zil_address; 
+        address payable goerli_address; 
+        address payable sepolia_address; 
     }
 
-    function infoFor(string calldata _name) public view returns (Metadata memory) {
+    struct TokenInfo {
+        address contractAddress;
+        string name;
+        string url;
+        string avatar;
+        string description;
+        string notice;
+        string twitter;
+        string github;
+        bytes dweb;
+    }
+
+    struct TokenAddresses {
+        address payable arb1_address;
+        address payable avaxc_address;
+        address payable bsc_address;
+        address payable cro_address;
+        address payable ftm_address;
+        address payable gno_address;
+        address payable matic_address;
+        bytes near_address;
+        address payable op_address;
+        bytes sol_address;
+        bytes trx_address;
+        bytes zil_address; 
+        address payable goerli_address; 
+        address payable sepolia_address; 
+    }
+
+    function dataFor(string calldata _name) public view returns (Metadata memory) {
         bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
         namehash = keccak256(
             abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
@@ -87,7 +118,68 @@ contract TNS {
             bytesToAddress(resolver.addr(namehash, 2147483658)), // OP
             resolver.addr(namehash, 501), // SOL
             resolver.addr(namehash, 195), // TRX
-            resolver.addr(namehash, 119)  // ZIL
+            resolver.addr(namehash, 119), // ZIL
+            bytesToAddress(resolver.addr(namehash, 2147483643)), // Goerli Testnet
+            bytesToAddress(resolver.addr(namehash, 2136328537)) // Sepolia Testnet
+        );
+    }
+
+    function infoFor(string calldata _name) public view returns (TokenInfo memory) {
+        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
+        );
+        address resolverAddr = ens.resolver(namehash);
+        PublicResolver resolver = PublicResolver(resolverAddr);
+
+        return TokenInfo(
+            resolver.addr(namehash),
+            resolver.text(namehash, "name"),
+            resolver.text(namehash, "url"),
+            resolver.text(namehash, "avatar"),
+            resolver.text(namehash, "description"),
+            resolver.text(namehash, "notice"),
+            resolver.text(namehash, "com.twitter"),
+            resolver.text(namehash, "com.github"),
+            resolver.contenthash(namehash)
+        );
+    }
+
+    function addressesFor(string calldata _name) public view returns (TokenAddresses memory) {
+        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
+        );
+        namehash = keccak256(
+            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
+        );
+        address resolverAddr = ens.resolver(namehash);
+        PublicResolver resolver = PublicResolver(resolverAddr);
+
+        return TokenAddresses(
+            bytesToAddress(resolver.addr(namehash, 2147525809)), // ARB1trum
+            bytesToAddress(resolver.addr(namehash, 2147526762)), // AVAXC
+            bytesToAddress(resolver.addr(namehash, 2147483704)), // BSC
+            bytesToAddress(resolver.addr(namehash, 2147483673)), // CRO
+            bytesToAddress(resolver.addr(namehash, 2147483898)), // FTM
+            bytesToAddress(resolver.addr(namehash, 2147483748)), // GNO
+            bytesToAddress(resolver.addr(namehash, 2147483785)), // MATIC Polygon
+            resolver.addr(namehash, 397), // NEAR
+            bytesToAddress(resolver.addr(namehash, 2147483658)), // OP
+            resolver.addr(namehash, 501), // SOL
+            resolver.addr(namehash, 195), // TRX
+            resolver.addr(namehash, 119), // ZIL
+            bytesToAddress(resolver.addr(namehash, 2147483643)), // Goerli Testnet
+            bytesToAddress(resolver.addr(namehash, 2136328537)) // Sepolia Testnet
         );
     }
 
