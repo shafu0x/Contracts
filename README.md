@@ -5,4 +5,4 @@ For API documentation, see: [tkn.xyz/#developer-docs-start](https://tkn.xyz/#dev
 ### Contract Locations:  
 TNS.sol -   
   Mainnet: [0x99Ed999699E28Ff717F5f79e3391D4B9695549a3](https://etherscan.io/address/0x99Ed999699E28Ff717F5f79e3391D4B9695549a3#code)  
-  Goerli: [0x511903FACe0A20f5614E56eD0eB395c1C0101776](https://goerli.etherscan.io/address/0x511903face0a20f5614e56ed0eb395c1c0101776#code)
+  Goerli: [0x4dcb239691acbd8c60009479c945284f15111bda](https://goerli.etherscan.io/address/0x4dcb239691acbd8c60009479c945284f15111bda#code)
