@@ -40,6 +40,7 @@ contract TNS {
         bytes dweb;
         address payable arb1_address;
         address payable avaxc_address;
+        address payable base_address;
         address payable bsc_address;
         address payable cro_address;
         address payable ftm_address;
@@ -69,6 +70,7 @@ contract TNS {
     struct TokenAddresses {
         address payable arb1_address;
         address payable avaxc_address;
+        address payable base_address;
         address payable bsc_address;
         address payable cro_address;
         address payable ftm_address;
@@ -109,6 +111,7 @@ contract TNS {
             resolver.contenthash(namehash),
             bytesToAddress(resolver.addr(namehash, 2147525809)), // ARB1trum
             bytesToAddress(resolver.addr(namehash, 2147526762)), // AVAXC
+            bytesToAddress(resolver.addr(namehash, 2147475195)), // Base (By Coinbase)
             bytesToAddress(resolver.addr(namehash, 2147483704)), // BSC
             bytesToAddress(resolver.addr(namehash, 2147483673)), // CRO
             bytesToAddress(resolver.addr(namehash, 2147483898)), // FTM
@@ -168,6 +171,7 @@ contract TNS {
         return TokenAddresses(
             bytesToAddress(resolver.addr(namehash, 2147525809)), // ARB1trum
             bytesToAddress(resolver.addr(namehash, 2147526762)), // AVAXC
+            bytesToAddress(resolver.addr(namehash, 2147475195)), // Base (By Coinbase)
             bytesToAddress(resolver.addr(namehash, 2147483704)), // BSC
             bytesToAddress(resolver.addr(namehash, 2147483673)), // CRO
             bytesToAddress(resolver.addr(namehash, 2147483898)), // FTM
