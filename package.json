@@ -17,13 +17,14 @@
     "chai": "^4.3.4",
     "eth-ens-namehash": "^2.0.8",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.4",
-    "hardhat": "^2.6.0",
-    "hardhat-abi-exporter": "^2.3.0"
+    "ethers": "^5.7.2",
+    "hardhat": "^2.13.0",
+    "hardhat-abi-exporter": "^2.3.1"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts": "^4.8.2",
     "@remix-project/remixd": "^0.5.1",
+    "cid-tool": "^3.0.0",
     "commander": "^6.1.0",
     "ts-node": "^10.2.1"
   }
