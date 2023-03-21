@@ -30,6 +30,7 @@
 // 11-A Edit https://github.com/TickerDao/Registry by adding string in TokensAddedForRegistry.txt
 // 11-B Upload that tns.json file to pinata and get the cid
 // 11-C Put the tns.json CID in the contenthash field of registry.tkn.eth here https://app.ens.domains/name/registry.tkn.eth/details
+// 12 Return the tkn.eth controller to a secure account
 
 const axios = require('axios');
 const CIDTool = require('cid-tool')
@@ -274,7 +275,7 @@ axios.defaults.headers.common['x-cg-pro-api-key'] = COINGECKO_API_KEY; // Update
     
           let fullNode = namehash.hash(fullDomain)
           let currentOwner = await ensContract.owner(fullNode)
-          console.log("Symbol:", token.symbol, " . Domain owned by", currentOwner, "Full domain:", fullDomain)
+          console.log("Symbol:", token.symbol, "  Domain owned by", currentOwner, "Full domain:", fullDomain)
 
           // TODO: Compare datapoints to onchain data and produce a multicall txn to fill in outdated data in the resolver (may be subject to review)
           
