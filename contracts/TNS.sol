@@ -35,6 +35,8 @@ contract TNS {
         string avatar;
         string description;
         string notice;
+        string version;
+        string decimals;
         string twitter;
         string github;
         bytes dweb;
@@ -62,6 +64,8 @@ contract TNS {
         string avatar;
         string description;
         string notice;
+        string version;
+        string decimals;
         string twitter;
         string github;
         bytes dweb;
@@ -106,6 +110,8 @@ contract TNS {
             resolver.text(namehash, "avatar"),
             resolver.text(namehash, "description"),
             resolver.text(namehash, "notice"),
+            resolver.text(namehash, "version"),
+            resolver.text(namehash, "decimals"),
             resolver.text(namehash, "com.twitter"),
             resolver.text(namehash, "com.github"),
             resolver.contenthash(namehash),
@@ -148,6 +154,8 @@ contract TNS {
             resolver.text(namehash, "avatar"),
             resolver.text(namehash, "description"),
             resolver.text(namehash, "notice"),
+            resolver.text(namehash, "version"),
+            resolver.text(namehash, "decimals"),
             resolver.text(namehash, "com.twitter"),
             resolver.text(namehash, "com.github"),
             resolver.contenthash(namehash)
