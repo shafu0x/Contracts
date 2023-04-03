@@ -146,3 +146,12 @@ interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
+
+/**
+ * @dev ENS Reverse Resolver contract: https://github.com/ensdomains/resolvers/blob/master/contracts/DefaultReverseResolver.sol
+ */
+interface DefaultReverseResolver {
+  function ens (  ) external returns ( address );
+  function name ( bytes32 ) external view returns ( string calldata );
+  function setName ( bytes32 node, string calldata _name ) external;
+}
