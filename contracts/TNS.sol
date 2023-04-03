@@ -228,6 +228,21 @@ contract TNS {
     }
 
     // Helpers
+    // Get the ENS name for an address in a single query (reverse resolver)
+    bytes32 constant ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
+    function ensReverseResolver(string calldata _address) public view returns (string memory) {
+        // Calculate Namehash
+        bytes32 namehash = keccak256(
+            abi.encodePacked(ADDR_REVERSE_NODE, keccak256(abi.encodePacked(_address)))
+        );
+        // Ask registry for reverse resolver
+        address resolverAddr = ens.resolver(namehash);
+        // Ask reverse resolver for name
+        DefaultReverseResolver reverseResolver = DefaultReverseResolver(resolverAddr);
+        return reverseResolver.name(namehash);
+    }
+
+    // Internal Helpers
     function bytesToAddress(bytes memory b)
         internal
         pure
